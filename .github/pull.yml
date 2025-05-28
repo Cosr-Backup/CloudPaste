@@ -1,0 +1,5 @@
+version: "1"
+rules:
+  - base: main
+    upstream: ling-drag0n:main # change `wei` to the owner of upstream repo
+    mergeMethod: merge
