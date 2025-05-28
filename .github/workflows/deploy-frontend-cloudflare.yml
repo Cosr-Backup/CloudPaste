@@ -96,12 +96,22 @@ jobs:
           fi
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "./frontend"
-          command: "pages deploy ./dist --project-name=cloudpaste-frontend --branch production"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # Wrangler CLI might need this
+        working-directory: ./frontend
+        run: |
+          echo "正在部署到 Cloudflare Pages (将尝试从输出中过滤URL)..."
+          # 使用 set -o pipefail 确保即使管道中的某个命令失败，整个命令也会失败
+          set -o pipefail
+          # 执行 wrangler pages deploy 并通过 grep -v 过滤掉包含 pages.dev URL 的行
+          # 正则表达式 "https://.*\.pages\.dev" 会匹配标准的 Cloudflare Pages URL
+          npx wrangler pages deploy ./dist --project-name=cloudpaste-frontend --branch=production | grep -v "https://.*\.pages\.dev"
+          
+          # 如果 npx wrangler pages deploy 失败, 由于 set -e (默认启用) 和 set -o pipefail,
+          # 整个步骤会自动标记为失败。
+          # 来自 wrangler pages deploy 的 stderr (错误信息) 应该仍然可见。
+          echo "✅ Wrangler pages deploy 命令已执行 (URL已尝试从标准输出中过滤)。"
 
       - name: Display Success Information
         if: steps.check-deploy-button.outputs.is_deploy_button == 'true' && success()
@@ -116,7 +126,7 @@ jobs:
           echo "- 添加 VITE_BACKEND_URL = 您的后端Worker URL"
           echo ""
           echo "后续步骤："
-          echo "1. 访问您的 Cloudflare Pages URL"
+          echo "1. 访问您的 Cloudflare Pages URL (部署URL已在日志中隐藏)"
           echo "2. 使用默认管理员账户登录 (admin/admin123)"
           echo "3. 立即修改默认管理员密码"
           echo "4. 在管理员面板中配置您的S3兼容存储"
