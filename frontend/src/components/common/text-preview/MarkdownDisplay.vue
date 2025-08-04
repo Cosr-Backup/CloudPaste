@@ -69,9 +69,9 @@ const loadVditor = async () => {
     try {
       await loadVditorCSS();
 
-      // 从本地assets/vditor目录加载Vditor
+      // 从本地vditor目录加载Vditor
       const script = document.createElement("script");
-      script.src = "/assets/vditor/index.min.js";
+      script.src = "/assets/vditor/dist/index.min.js";
 
       await new Promise((resolve, reject) => {
         script.onload = async () => {
@@ -130,7 +130,7 @@ const loadVditorCSS = async () => {
   if (!vditorCSSLoaded) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/assets/vditor/index.css";
+    link.href = "/assets/vditor/dist/index.css";
     document.head.appendChild(link);
     vditorCSSLoaded = true;
   }
@@ -181,6 +181,7 @@ const renderMarkdown = async () => {
         mode: "dark-light", // 支持明暗主题
         theme: {
           current: props.darkMode ? "dark" : "light", // 根据darkMode设置主题
+          path: "/assets/vditor/dist/css/content-theme",
         },
         cdn: "/assets/vditor",
         hljs: {
