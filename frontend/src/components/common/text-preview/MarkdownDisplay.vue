@@ -69,9 +69,9 @@ const loadVditor = async () => {
     try {
       await loadVditorCSS();
 
-      // 从assets目录加载Vditor
+      // 从本地assets/vditor目录加载Vditor
       const script = document.createElement("script");
-      script.src = "/assets/vditor/dist/index.min.js";
+      script.src = "/assets/vditor/index.min.js";
 
       await new Promise((resolve, reject) => {
         script.onload = async () => {
@@ -130,7 +130,7 @@ const loadVditorCSS = async () => {
   if (!vditorCSSLoaded) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/assets/vditor/dist/index.css";
+    link.href = "/assets/vditor/index.css";
     document.head.appendChild(link);
     vditorCSSLoaded = true;
   }
@@ -168,7 +168,6 @@ const renderMarkdown = async () => {
       console.error("Vditor 加载失败:", loadError);
       throw new Error(`Vditor 加载失败: ${loadError.message}`);
     }
-
 
     // 再次检查组件状态
     if (isDestroyed.value || !markdownContainer.value) {
